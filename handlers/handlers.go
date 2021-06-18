@@ -117,7 +117,8 @@ var UserHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var UserListHandler = func(w http.ResponseWriter, r *http.Request) {
-	utils.Respond(w, models.GetUserList())
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	utils.Respond(w, models.GetUserList(id))
 }
 
 var MessageListHandler = func(w http.ResponseWriter, r *http.Request) {
@@ -264,7 +265,7 @@ var PostUserGroup = func(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if ug.Id == 0 {
-		models.CreateUserGroup(ug)
+		ug.Id = int(models.CreateUserGroup(ug))
 	} else {
 		models.UpdateUserGroup(ug)
 	}

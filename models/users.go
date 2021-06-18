@@ -18,6 +18,8 @@ type User struct {
 	Layers   bool   `json:"layers"`
 	Dicts    bool   `json:"dicts"`
 	Messages bool   `json:"messages"`
+	Info     bool   `json:"info"`
+	GroupId  int    `json:"group"`
 }
 
 type UserGroups struct {
@@ -27,6 +29,7 @@ type UserGroups struct {
 	Layers   bool   `json:"layers"`
 	Dicts    bool   `json:"dicts"`
 	Messages bool   `json:"messages"`
+	Info     bool   `json:"info"`
 }
 
 func GetUser(token string) *User {
@@ -37,7 +40,7 @@ func GetUser(token string) *User {
 	var user = User{}
 
 	if rows.Next() {
-		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages)
+		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId)
 		if err != nil {
 			log.Print(err)
 		}
@@ -45,16 +48,16 @@ func GetUser(token string) *User {
 	return &user
 }
 
-func GetUserList() []*User {
+func GetUserList(id int) []*User {
 	res := make([]*User, 0)
 
-	rows, err := db.Query(sql.UserList)
+	rows, err := db.Query(sql.UserList, id, id)
 	if err != nil {
 		log.Print(err)
 	}
 	for rows.Next() {
 		user := User{}
-		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages)
+		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId)
 		res = append(res, &user)
 	}
 
@@ -69,7 +72,7 @@ func CreateUser(user *User) {
 }
 
 func UpdateUser(user *User) {
-	_, err := db.Exec(sql.UserUpdate, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Token)
+	_, err := db.Exec(sql.UserUpdate, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Token)
 	if err != nil {
 		log.Print(err)
 	}
@@ -84,22 +87,27 @@ func GetUserGroups() []*UserGroups {
 	}
 	for rows.Next() {
 		ug := UserGroups{}
-		err = rows.Scan(&ug.Id, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages)
+		err = rows.Scan(&ug.Id, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages, &ug.Info)
 		res = append(res, &ug)
 	}
 
 	return res
 }
 
-func CreateUserGroup(ug *UserGroups) {
-	_, err := db.Exec(sql.UserGroupCreate, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages)
+func CreateUserGroup(ug *UserGroups) int64 {
+	row, err := db.Exec(sql.UserGroupCreate, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages, &ug.Info)
 	if err != nil {
 		log.Print(err)
 	}
+	id, err := row.LastInsertId()
+	if err == nil {
+		return id
+	}
+	return 0
 }
 
 func UpdateUserGroup(ug *UserGroups) {
-	_, err := db.Exec(sql.UserGroupUpdate, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages, &ug.Id)
+	_, err := db.Exec(sql.UserGroupUpdate, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages, &ug.Info, &ug.Id)
 	if err != nil {
 		log.Print(err)
 	}

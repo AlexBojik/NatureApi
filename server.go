@@ -38,7 +38,7 @@ func main() {
 	router.HandleFunc("/user/{token}", h.UserHandler).Methods("GET")
 	router.HandleFunc("/user", h.UserCreateHandler).Methods("POST")
 	router.HandleFunc("/user_put", h.UserPutHandler).Methods("POST")
-	router.HandleFunc("/user_list", h.UserListHandler).Methods("GET")
+	router.HandleFunc("/user_list/{id:[0-9]+}", h.UserListHandler).Methods("GET")
 	router.HandleFunc("/user_groups", h.UserGroupsHandler).Methods("GET", "POST", "PUT")
 
 	//messages
@@ -70,5 +70,5 @@ func main() {
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS", "DELETE"}),
 		handlers.AllowedOrigins([]string{"*"}))(router)
 
-	http.ListenAndServe(":" + port, cors)
+	http.ListenAndServe(":"+port, cors)
 }
