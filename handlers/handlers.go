@@ -28,9 +28,10 @@ var BaseLayerHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var LayersHandler = func(w http.ResponseWriter, r *http.Request) {
+	hasInfoRole := models.HasInfoRole(r.Header.Get("Token"))
 	switch r.Method {
 	case "GET":
-		utils.Respond(w, models.GetLayers())
+		utils.Respond(w, models.GetLayers(hasInfoRole))
 		break
 	case "POST":
 		//CreateBaseLayer(w, r)
@@ -62,13 +63,14 @@ var ClusterHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var FilterHandler = func(w http.ResponseWriter, r *http.Request) {
+	hasInfoRole := models.HasInfoRole(r.Header.Get("Token"))
 	f := &models.Filter{}
 	err := json.NewDecoder(r.Body).Decode(f)
 	if err != nil {
 		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
 		return
 	}
-	utils.Respond(w, models.GetFeaturesBy(f))
+	utils.Respond(w, models.GetFeaturesBy(f, hasInfoRole))
 }
 
 var CheckHandler = func(w http.ResponseWriter, r *http.Request) {

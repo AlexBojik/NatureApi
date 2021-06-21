@@ -66,7 +66,7 @@ func main() {
 	port := os.Getenv("PORT")
 
 	cors := handlers.CORS(
-		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"}),
+		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "Token"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD", "OPTIONS", "DELETE"}),
 		handlers.AllowedOrigins([]string{"*"}))(router)
 

@@ -37,7 +37,7 @@ func CheckPosition(check *Check) []string {
 	return res
 }
 
-func GetFeaturesBy(filter *Filter) []*Object {
+func GetFeaturesBy(filter *Filter, hasInfoRole bool) []*Object {
 	var rows *sql2.Rows = nil
 	var err error = nil
 	switch filter.Type {
@@ -67,7 +67,8 @@ func GetFeaturesBy(filter *Filter) []*Object {
 		err = rows.Scan(&ob.Id, &ob.LayerId, &ob.Name, &ob.GeoJson)
 
 		description := ""
-		rowsF, err := db.Query(sql.AdditionalFields, ob.Id)
+
+		rowsF, err := db.Query(sql.AdditionalFields, hasInfoRole, ob.Id)
 		if err != nil {
 			log.Println(err)
 			continue

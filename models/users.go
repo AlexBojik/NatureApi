@@ -112,3 +112,7 @@ func UpdateUserGroup(ug *UserGroups) {
 		log.Print(err)
 	}
 }
+
+func HasInfoRole(token string) bool {
+	return GetUser(token).Info
+}

@@ -2,7 +2,7 @@ package sql
 
 var BaseLayerList = "select id, name, url, description, minZoom, maxZoom from base_layers order by id"
 var GroupLayerList = "select id, name, icon from group_layers order by id"
-var LayerList = "select group_id, id, name, type, url, color, commonName, commonDescription, symbol, cluster, line_width, line_color from layers where group_id = ? order by `order`"
+var LayerList = "select group_id, id, name, type, url, color, commonName, commonDescription, symbol, cluster, line_width, line_color from layers where group_id = ? and (not limitation or ?) order by `order`"
 var NewsList = "select id, descr, created, start_date, end_date from news where ?=? order by id"
 var NewsFilteredList = "select id, descr, created, start_date, end_date FROM news where start_date < ? and IFNULL(end_date, '2100-01-01 01:00:00') > ? order by id"
 var Layer = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.layerId = ? and o.id = c.id"
@@ -13,7 +13,7 @@ var NewsUpdate = "update news SET created=?, start_date=?, end_date=?, descr=? w
 var BaseLayerDelete = "delete from base_layers where id=?"
 var NewsDelete = "delete from news where id=?"
 var FeaturesByFilter = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id inner join (select id from objects o where name like CONCAT('%', ?, '%') union select objectId from fields_values fv where value like CONCAT('%', ?, '%') union select objectId id from fields_values fv inner join dictionary_values dv on fv.value_num = dv.id where name like CONCAT('%',? ,'%') LIMIT 100) f on o.id = f.id"
-var AdditionalFields = "select f.name, IFNULL(dv.name, fv.value) as value from fields_values fv INNER JOIN fields f ON f.id = fv.fieldId LEFT JOIN dictionary_values dv  ON f.`type` = dv.dictId AND fv.value_num = dv.id where objectId = ? order by fv.fieldId"
+var AdditionalFields = "select f.name, IFNULL(dv.name, fv.value) as value from fields_values fv INNER JOIN fields f ON f.id = fv.fieldId AND (not f.limitation OR ?) LEFT JOIN dictionary_values dv  ON f.`type` = dv.dictId AND fv.value_num = dv.id where objectId = ? order by fv.fieldId"
 var FeaturesByIds = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id where o.id in (%s)"
 var FeaturesByRegion = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id WHERE ST_Contains(ST_SRID(ST_GeomFromText(?), 4326), g) LIMIT 100"
 var FieldsList = "select id, name from dictionary_values"

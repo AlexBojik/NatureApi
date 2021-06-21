@@ -30,7 +30,7 @@ type Layer struct {
 	LineColor         string `json:"lineColor"`
 }
 
-func GetLayers() []*GroupLayer {
+func GetLayers(hasInfoRole bool) []*GroupLayer {
 	res := make([]*GroupLayer, 0)
 
 	rows, err := db.Query(sql.GroupLayerList)
@@ -43,7 +43,7 @@ func GetLayers() []*GroupLayer {
 		bl.IsGroup = true
 		err = rows.Scan(&bl.Id, &bl.Name, &bl.Icon)
 
-		rowsL, err := db.Query(sql.LayerList, bl.Id)
+		rowsL, err := db.Query(sql.LayerList, bl.Id, hasInfoRole)
 		if err != nil {
 			log.Print(err)
 		}
