@@ -10,6 +10,7 @@ import (
 	"net/smtp"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 	"water-api/sql"
 	"water-api/utils"
@@ -127,7 +128,8 @@ func SendMail(m *Message) {
 	username := os.Getenv("MAIL_AUTH")
 	password := os.Getenv("MAIL_PASS")
 	server := os.Getenv("MAIL_SERVER")
-	mailTo := os.Getenv("MAIL_TO")
+	//mailTo := os.Getenv("MAIL_TO")
+	mailTo := getEnvAsSlice("MAIL_TO", ",")
 	imageSrc := os.Getenv("IMAGE_SRC")
 
 	auth := smtp.PlainAuth("", username, password, server)
@@ -151,10 +153,17 @@ func SendMail(m *Message) {
 
 	contentType := "Content-Type: text/html; charset=UTF-8"
 	msg := []byte("From: Природа26 <" + username + ">\r\n" + "Subject: Природа26. Новое обращение! \r\n" + contentType + "\r\n\r\n" + body)
-	err := smtp.SendMail(server+":25", auth, username, []string{mailTo}, msg)
+
+	err := smtp.SendMail(server+":25", auth, username, mailTo, msg)
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	_, err = db.Exec(sql.MessageUpdateStatus, 1, m.Id)
+}
+
+func getEnvAsSlice(name string, sep string) []string {
+	valStr := os.Getenv(name)
+	val := strings.Split(valStr, sep)
+	return val
 }
