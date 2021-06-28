@@ -135,7 +135,7 @@ func SendMail(m *Message) {
 	body := "<html>"
 	body += "<body>"
 	body += "<strong>Номер обращения:</strong> " + strconv.Itoa(int(m.Id)) + "<br>"
-	body += "<strong>Время обращения:</strong> " + strconv.Itoa(int(m.Id)) + "<br>"
+	//body += "<strong>Время обращения:</strong> " + strconv.Itoa(int(m.Id)) + "<br>"
 	body += "<strong>ФИО:</strong> " + user.Name + "<br>"
 	body += "<strong>Текст обращения:</strong> " + m.Text + "<br>"
 	body += "<strong>Координаты:</strong> " + fmt.Sprintf("%f", m.Lat) + ", " + fmt.Sprintf("%f", m.Lon) + "<br>"
