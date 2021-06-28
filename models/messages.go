@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -126,44 +127,78 @@ func SendMail(m *Message) {
 	}
 
 	username := os.Getenv("MAIL_AUTH")
-	password := os.Getenv("MAIL_PASS")
 	server := os.Getenv("MAIL_SERVER")
-	//mailTo := os.Getenv("MAIL_TO")
-	mailTo := getEnvAsSlice("MAIL_TO", ",")
+	mailTo := os.Getenv("MAIL_TO")
 	imageSrc := os.Getenv("IMAGE_SRC")
-
-	auth := smtp.PlainAuth("", username, password, server)
 
 	user := GetUser(m.Token)
 	body := "<html>"
 	body += "<body>"
-	body += "<h3>Номер обращения: " + strconv.Itoa(int(m.Id)) + "</h3>"
-	body += "<h3>ФИО: " + user.Name + "</h3>"
-	body += "<h3>Текст обращения: " + m.Text + "</h3>"
-	body += "<h3>Координаты: " + fmt.Sprintf("%f", m.Lat) + ", " + fmt.Sprintf("%f", m.Lon) + "</h3>"
-	body += "<h3>Телефон: " + user.Phone + "</h3>"
-	body += "<h3>E-mail: " + user.Email + "</h3>"
-	body += "<h3>Адрес: " + user.ProAddr + "</h3>"
-	body += "<h3>Прикрепленные изображения:</b></h3>"
+	body += "<strong>Номер обращения:</strong> " + strconv.Itoa(int(m.Id)) + "<br>"
+	body += "<strong>Время обращения:</strong> " + strconv.Itoa(int(m.Id)) + "<br>"
+	body += "<strong>ФИО:</strong> " + user.Name + "<br>"
+	body += "<strong>Текст обращения:</strong> " + m.Text + "<br>"
+	body += "<strong>Координаты:</strong> " + fmt.Sprintf("%f", m.Lat) + ", " + fmt.Sprintf("%f", m.Lon) + "<br>"
+	body += "<strong>Телефон:</strong> " + user.Phone + "<br>"
+	body += "<strong>E-mail:</strong> " + user.Email + "<br>"
+	body += "<strong>Адрес:</strong> " + user.ProAddr + "<br>"
+	body += "<strong>Прикрепленные изображения:</strong><br>"
 	for _, img := range m.Images {
 		body += "<img src=\"" + imageSrc + img.Jpeg + "\" style=\"width: 200px; height: 200px;\">"
 	}
 	body += "</html>"
 	body += "</body>"
 
-	contentType := "Content-Type: text/html; charset=UTF-8"
-	msg := []byte("From: Природа26 <" + username + ">\r\n" + "Subject: Природа26. Новое обращение! \r\n" + contentType + "\r\n\r\n" + body)
+	subject := "Природа26. Новое обращение!"
 
-	err := smtp.SendMail(server+":25", auth, username, mailTo, msg)
+	var toMail []string
+	toMail = strings.Split(mailTo, ",")
+
+	err := sendMail(server+":25", username, subject, body, toMail)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	_, err = db.Exec(sql.MessageUpdateStatus, 1, m.Id)
 }
 
-func getEnvAsSlice(name string, sep string) []string {
-	valStr := os.Getenv(name)
-	val := strings.Split(valStr, sep)
-	return val
+func sendMail(addr, from, subject, body string, to []string) error {
+	r := strings.NewReplacer("\r\n", "", "\r", "", "\n", "", "%0a", "", "%0d", "")
+
+	c, err := smtp.Dial(addr)
+	if err != nil {
+		return err
+	}
+	defer c.Close()
+	if err = c.Mail(r.Replace(from)); err != nil {
+		return err
+	}
+	for i := range to {
+		to[i] = r.Replace(to[i])
+		if err = c.Rcpt(to[i]); err != nil {
+			return err
+		}
+	}
+	w, err := c.Data()
+	if err != nil {
+		return err
+	}
+
+	msg := "To: " + strings.Join(to, ",") + "\r\n" +
+		"From: " + from + "\r\n" +
+		"Subject: " + subject + "\r\n" +
+		"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
+		"Content-Transfer-Encoding: base64\r\n" +
+		"\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
+
+	_, err = w.Write([]byte(msg))
+	if err != nil {
+		return err
+	}
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+	return c.Quit()
 }
