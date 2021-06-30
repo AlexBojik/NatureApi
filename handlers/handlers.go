@@ -34,12 +34,61 @@ var LayersHandler = func(w http.ResponseWriter, r *http.Request) {
 		utils.Respond(w, models.GetLayers(hasInfoRole))
 		break
 	case "POST":
-		//CreateBaseLayer(w, r)
+		CreateLayer(w, r)
 		break
 	case "PUT":
-		//UpdateBaseLayer(w, r)
+		UpdateLayer(w, r)
 		break
 	}
+}
+
+var ObjectsHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		break
+	case "POST":
+		CreateObject(w, r)
+		break
+	case "PUT":
+		//UpdateObject(w, r)
+		break
+	}
+}
+
+func CreateObject(w http.ResponseWriter, r *http.Request) {
+	o := &models.Object{}
+	err := json.NewDecoder(r.Body).Decode(o)
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	id := models.CreateObject(o)
+	utils.Created(w, id)
+}
+
+func CreateLayer(w http.ResponseWriter, r *http.Request) {
+	l := &models.Layer{}
+	err := json.NewDecoder(r.Body).Decode(l)
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	id := models.CreateLayer(l)
+	utils.Created(w, id)
+}
+
+func UpdateLayer(w http.ResponseWriter, r *http.Request) {
+	l := &models.Layer{}
+	err := json.NewDecoder(r.Body).Decode(l)
+	if err != nil {
+		fmt.Println(err)
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+	models.UpdateLayer(l)
+	utils.Respond(w, utils.Message(true, "Update success"))
 }
 
 var LayerHandler = func(w http.ResponseWriter, r *http.Request) {

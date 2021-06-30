@@ -18,7 +18,7 @@ func main() {
 	router.HandleFunc("/base_layers/{id:[0-9]+}", h.BaseLayerHandlerDelete).Methods("DELETE")
 
 	// Layers
-	router.HandleFunc("/layers", h.LayersHandler).Methods("GET")
+	router.HandleFunc("/layers", h.LayersHandler).Methods("GET", "POST", "PUT")
 	router.HandleFunc("/layers/{id:[0-9]+}", h.LayerHandler).Methods("GET")
 	router.HandleFunc("/cluster/{id:[0-9]+}", h.ClusterHandler).Methods("GET")
 
@@ -58,6 +58,9 @@ func main() {
 	router.HandleFunc("/news", h.NewsHandler).Methods("GET", "POST", "PUT")
 	router.HandleFunc("/news_list", h.NewsFilteredListHandler).Methods("GET")
 	router.HandleFunc("/news/{id:[0-9]+}", h.NewsHandlerDelete).Methods("DELETE")
+
+	// objects
+	router.HandleFunc("/objects", h.ObjectsHandler).Methods("POST", "PUT")
 
 	router.PathPrefix("/image/").Handler(http.StripPrefix("/image/", http.FileServer(http.Dir("images"))))
 

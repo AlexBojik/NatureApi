@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	geojson "github.com/paulmach/go.geojson"
 	"log"
 	"water-api/sql"
@@ -28,6 +29,9 @@ type Layer struct {
 	Cluster           bool   `json:"cluster"`
 	LineWidth         int    `json:"lineWidth"`
 	LineColor         string `json:"lineColor"`
+	Warning           bool   `json:"warning"`
+	Order             int    `json:"order"`
+	Limitation        bool   `json:"limitation"`
 }
 
 func GetLayers(hasInfoRole bool) []*GroupLayer {
@@ -50,7 +54,21 @@ func GetLayers(hasInfoRole bool) []*GroupLayer {
 		for rowsL.Next() {
 			l := Layer{}
 			l.IsGroup = false
-			rowsL.Scan(&l.Group, &l.Id, &l.Name, &l.Type, &l.Url, &l.Color, &l.CommonName, &l.CommonDescription, &l.Symbol, &l.Cluster, &l.LineWidth, &l.LineColor)
+			rowsL.Scan(&l.Group,
+				&l.Id,
+				&l.Name,
+				&l.Type,
+				&l.Url,
+				&l.Color,
+				&l.CommonName,
+				&l.CommonDescription,
+				&l.Symbol,
+				&l.Cluster,
+				&l.LineWidth,
+				&l.LineColor,
+				&l.Warning,
+				&l.Limitation,
+				&l.Order)
 			bl.Layers = append(bl.Layers, l)
 		}
 
@@ -108,18 +126,49 @@ func GetCluster(id int) *geojson.FeatureCollection {
 	return &res
 }
 
-//func CreateBaseLayer(layer *BaseLayer) int64 {
-//	// TODO: обработка ошибок
-//	res, _ := db.Exec(sql.BaseLayersCreate, layer.Name, layer.Url, layer.Description)
-//	id, _ := res.LastInsertId()
-//	return id
-//}
-//
-//func UpdateBaseLayer(layer *BaseLayer) {
-//	// TODO: обработка ошибок
-//	db.Exec(sql.BaseLayerUpdate, layer.Name, layer.Url, layer.Description, layer.Id)
-//}
-//
+func CreateLayer(l *Layer) int64 {
+	res, _ := db.Exec(sql.LayerCreate,
+		l.Name,
+		l.Type,
+		l.Group,
+		l.Url,
+		l.Color,
+		l.CommonName,
+		l.CommonDescription,
+		l.Warning,
+		l.Symbol,
+		l.Cluster,
+		l.Order,
+		l.LineWidth,
+		l.LineColor,
+		l.Limitation)
+	id, _ := res.LastInsertId()
+	return id
+}
+
+func UpdateLayer(l *Layer) {
+	_, err := db.Exec(sql.LayerUpdate,
+		l.Name,
+		l.Type,
+		l.Group,
+		l.Url,
+		l.Color,
+		l.CommonName,
+		l.CommonDescription,
+		l.Warning,
+		l.Symbol,
+		l.Cluster,
+		l.Order,
+		l.LineWidth,
+		l.LineColor,
+		l.Limitation,
+		l.Id)
+
+	if err != nil {
+		fmt.Print(err)
+	}
+}
+
 //func DeleteBaseLayer(id int) {
 //	// TODO: обработка ошибок
 //	db.Exec(sql.BaseLayerDelete, id)
