@@ -18,14 +18,19 @@ import (
 )
 
 type Message struct {
-	Id       int64   `json:"id"`
-	UserName string  `json:"userName"`
-	Status   int     `json:"status"`
-	Images   []Image `json:"images"`
-	Text     string  `json:"text"`
-	Lat      float32 `json:"lat"`
-	Lon      float32 `json:"lon"`
-	Token    string  `json:"token"`
+	Id           int64   `json:"id"`
+	UserName     string  `json:"userName"`
+	Status       int     `json:"status"`
+	Images       []Image `json:"images"`
+	Text         string  `json:"text"`
+	Lat          float32 `json:"lat"`
+	Lon          float32 `json:"lon"`
+	Token        string  `json:"token"`
+	Time         int     `json:"time"`
+	End          int     `json:"end"`
+	Comment      string  `json:"comment"`
+	EmployerId   string  `json:"employerId"`
+	EmployerName string  `json:"employerName"`
 }
 
 type Image struct {
@@ -98,7 +103,7 @@ func GetMessageList() []*Message {
 	}
 	for rows.Next() {
 		m := Message{}
-		err = rows.Scan(&m.Id, &m.Text, &m.UserName, &m.Status)
+		err = rows.Scan(&m.Id, &m.Text, &m.UserName, &m.Status, &m.Time, &m.End, &m.Comment, &m.EmployerId, &m.EmployerName)
 		res = append(res, &m)
 	}
 
@@ -201,4 +206,30 @@ func sendMail(addr, from, subject, body string, to []string) error {
 		return err
 	}
 	return c.Quit()
+}
+
+func UpdateMessage(m *Message) {
+	_, err := db.Exec(sql.MessageUpdateStatus, m.Status, m.Id)
+
+	if err != nil {
+		fmt.Println(err)
+	}
+	if m.Status == 3 {
+		_, err = db.Exec("update user_messages set end = ? where id = ?", time.Now().Unix(), m.Id)
+	}
+	if err != nil {
+		fmt.Println(err)
+	}
+	if m.Comment != "" {
+		_, err = db.Exec("update user_messages set comment = ? where id = ?", m.Comment, m.Id)
+	}
+	if err != nil {
+		fmt.Println(err)
+	}
+	if m.EmployerId != "" {
+		_, err = db.Exec("update user_messages set employerId = ? where id = ?", m.EmployerId, m.Id)
+	}
+	if err != nil {
+		fmt.Println(err)
+	}
 }

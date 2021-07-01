@@ -30,7 +30,7 @@ var UserUpdate = "update users SET admin=?, layers=?, dicts=?, messages=?, info=
 var Message = "select data FROM images where message_id = ?"
 var MessageCreate = "insert into user_messages (token, text, point, time) values(?, ?, ST_GeomFromText(?), ?)"
 var MessageCount = "select count(id) from user_messages WHERE status = 0"
-var MessageList = "select um.id, um.text, u.name, um.status from user_messages um inner join users u ON um.token = u.token"
+var MessageList = "select um.id, um.text, u.name, um.status, um.time, um.end, um.comment, um.employerId, e.name as employerName from user_messages um inner join users u ON um.token = u.token left join users e ON um.employerId = e.token"
 var MessageNotSendList = "select um.id, um.text, u.name, um.status, ST_AsGeoJSON(um.point) as point, u.token from user_messages um inner join users u ON um.token = u.token where um.status = 0"
 var ImageCreate = "insert into images (message_id, data) values(?, ?)"
 var MessageUpdateStatus = "update user_messages set status = ? where id = ?"

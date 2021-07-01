@@ -45,7 +45,7 @@ func main() {
 	router.HandleFunc("/send", h.MessageHandler).Methods("POST")
 	router.HandleFunc("/new_messages", h.NewMessageHandler).Methods("GET")
 	router.HandleFunc("/send_messages", h.SendMessageHandler).Methods("GET")
-	router.HandleFunc("/messages", h.MessageListHandler).Methods("GET")
+	router.HandleFunc("/messages", h.MessageListHandler).Methods("GET", "PUT")
 	router.HandleFunc("/messages/{id}", h.MessageGetHandler).Methods("GET")
 
 	// esia

@@ -173,7 +173,30 @@ var UserListHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var MessageListHandler = func(w http.ResponseWriter, r *http.Request) {
-	utils.Respond(w, models.GetMessageList())
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetMessageList())
+		break
+	case "POST":
+		//CreateBaseLayer(w, r)
+		break
+	case "PUT":
+		UpdateMessage(w, r)
+		break
+	}
+}
+
+var UpdateMessage = func(w http.ResponseWriter, r *http.Request) {
+	msg := &models.Message{}
+	err := json.NewDecoder(r.Body).Decode(msg)
+	if err != nil {
+		fmt.Println(err)
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	models.UpdateMessage(msg)
+	utils.Created(w, msg.Id)
 }
 
 var MessageHandler = func(w http.ResponseWriter, r *http.Request) {
