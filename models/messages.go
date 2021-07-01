@@ -1,7 +1,6 @@
 package models
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"github.com/joho/godotenv"
@@ -154,12 +153,10 @@ func SendMail(m *Message) {
 	body += "</html>"
 	body += "</body>"
 
-	subject := "Природа26. Новое обращение!"
-
 	var toMail []string
 	toMail = strings.Split(mailTo, ",")
 
-	err := sendMail(server+":25", username, subject, body, toMail)
+	err := sendMail(server+":25", username, body, toMail)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -168,7 +165,7 @@ func SendMail(m *Message) {
 	_, err = db.Exec(sql.MessageUpdateStatus, 1, m.Id)
 }
 
-func sendMail(addr, from, subject, body string, to []string) error {
+func sendMail(addr, from, body string, to []string) error {
 	r := strings.NewReplacer("\r\n", "", "\r", "", "\n", "", "%0a", "", "%0d", "")
 
 	c, err := smtp.Dial(addr)
@@ -190,12 +187,11 @@ func sendMail(addr, from, subject, body string, to []string) error {
 		return err
 	}
 
+	contentType := "Content-Type: text/html; charset=UTF-8"
 	msg := "To: " + strings.Join(to, ",") + "\r\n" +
 		"From: " + from + "\r\n" +
-		"Subject: " + subject + "\r\n" +
-		"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
-		"Content-Transfer-Encoding: base64\r\n" +
-		"\r\n" + base64.StdEncoding.EncodeToString([]byte(body))
+		"Subject: Природа26. Новое обращение \r\n" +
+		contentType + "\r\n\r\n" + body
 
 	_, err = w.Write([]byte(msg))
 	if err != nil {
