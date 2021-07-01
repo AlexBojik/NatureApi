@@ -148,7 +148,7 @@ func SendMail(m *Message) {
 	body += "<strong>Адрес:</strong> " + user.ProAddr + "<br>"
 	body += "<strong>Прикрепленные изображения:</strong><br>"
 	for _, img := range m.Images {
-		body += "<img alt=\"Прикрепленное изображение\" src=\"" + imageSrc + img.Jpeg + "\">"
+		body += "<a href=\"" + imageSrc + img.Jpeg + "\">Прикрепленное изображение</a>"
 	}
 	body += "</html>"
 	body += "</body>"
