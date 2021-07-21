@@ -24,8 +24,8 @@ type NameValue struct {
 
 func CheckPosition(check *Check) []string {
 	var res = make([]string, 0)
-	q := "SELECT name FROM layers WHERE warning and id in (SELECT DISTINCT layerId FROM objects where id in (SELECT id FROM (SELECT id, g FROM coordinates c WHERE MBRWithin(Point(?, ?), g)) t WHERE ST_Distance(g, Point(?, ?)) < 100))"
-	rows, err := db.Query(q, check.Lon, check.Lat, check.Lon, check.Lat)
+	q := "SELECT name FROM layers WHERE warning and id in (SELECT DISTINCT layerId FROM objects where id in (SELECT id FROM coordinates c WHERE ST_Intersects(ST_Buffer(Point(?, ?), 0.0001), g)))"
+	rows, err := db.Query(q, check.Lon, check.Lat)
 	if err != nil {
 		log.Print(err)
 	}
