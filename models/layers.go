@@ -169,7 +169,6 @@ func UpdateLayer(l *Layer) {
 	}
 }
 
-//func DeleteBaseLayer(id int) {
-//	// TODO: обработка ошибок
-//	db.Exec(sql.BaseLayerDelete, id)
-//}
+func DeleteLayer(id int) {
+	db.Exec("DELETE FROM layers where id = ?", id)
+}

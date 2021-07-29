@@ -2,6 +2,7 @@ package sql
 
 var BaseLayerList = "select id, name, url, description, minZoom, maxZoom from base_layers order by id"
 var GroupLayerList = "select id, name, icon from group_layers order by id"
+var DictionaryList = "select id, name from dictionaries order by name"
 var LayerList = "select group_id, id, name, type, url, color, commonName, commonDescription, symbol, cluster, line_width, line_color, warning, limitation, 'order' from layers where group_id = ? and (not limitation or ?) order by `order`"
 var NewsList = "select id, descr, created, start_date, end_date from news where ?=? order by start_date desc"
 var NewsFilteredList = "select id, descr, created, start_date, end_date FROM news where start_date < ? and IFNULL(end_date, '2100-01-01 01:00:00') > ? order by id"

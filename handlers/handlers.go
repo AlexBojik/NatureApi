@@ -27,6 +27,52 @@ var BaseLayerHandler = func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var DictionariesHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetDictionaries())
+		break
+	case "POST":
+		CreateDictionary(w, r)
+		break
+	case "PUT":
+		UpdateDictionary(w, r)
+		break
+	}
+}
+
+var ValuesHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetDictionariesValuesList())
+		break
+	case "POST":
+		CreateValue(w, r)
+		break
+	case "PUT":
+		UpdateValue(w, r)
+		break
+	}
+}
+
+var DictionariesIdHandler = func(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetValues(id))
+		break
+	case "DELETE":
+		models.DeleteDictionary(id)
+		break
+	}
+}
+
+var ValuesIdHandler = func(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	models.DeleteValue(id)
+}
+
 var LayersHandler = func(w http.ResponseWriter, r *http.Request) {
 	hasInfoRole := models.HasInfoRole(r.Header.Get("Token"))
 	switch r.Method {
@@ -55,6 +101,17 @@ var ObjectsHandler = func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var ObjectsIdHandler = func(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	switch r.Method {
+	case "DELETE":
+		models.DeleteObjectById(id)
+		utils.Respond(w, utils.Message(true, "Delete success"))
+		break
+	}
+}
+
 func CreateObject(w http.ResponseWriter, r *http.Request) {
 	o := &models.Object{}
 	err := json.NewDecoder(r.Body).Decode(o)
@@ -79,6 +136,54 @@ func CreateLayer(w http.ResponseWriter, r *http.Request) {
 	utils.Created(w, id)
 }
 
+func CreateDictionary(w http.ResponseWriter, r *http.Request) {
+	d := &models.Dictionary{}
+	err := json.NewDecoder(r.Body).Decode(d)
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	id := models.CreateDictionary(d)
+	utils.Created(w, id)
+}
+
+func UpdateDictionary(w http.ResponseWriter, r *http.Request) {
+	d := &models.Dictionary{}
+	err := json.NewDecoder(r.Body).Decode(d)
+	if err != nil {
+		fmt.Println(err)
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+	models.UpdateDictionary(d)
+	utils.Respond(w, utils.Message(true, "Update success"))
+}
+
+func CreateValue(w http.ResponseWriter, r *http.Request) {
+	v := &models.Value{}
+	err := json.NewDecoder(r.Body).Decode(v)
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	id := models.CreateValue(v)
+	utils.Created(w, id)
+}
+
+func UpdateValue(w http.ResponseWriter, r *http.Request) {
+	v := &models.Value{}
+	err := json.NewDecoder(r.Body).Decode(v)
+	if err != nil {
+		fmt.Println(err)
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+	models.UpdateValue(v)
+	utils.Respond(w, utils.Message(true, "Update success"))
+}
+
 func UpdateLayer(w http.ResponseWriter, r *http.Request) {
 	l := &models.Layer{}
 	err := json.NewDecoder(r.Body).Decode(l)
@@ -92,13 +197,15 @@ func UpdateLayer(w http.ResponseWriter, r *http.Request) {
 }
 
 var LayerHandler = func(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
 	switch r.Method {
 	case "GET":
-		id, _ := strconv.Atoi(mux.Vars(r)["id"])
 		utils.Respond(w, models.GetLayer(id))
 		break
-	case "POST":
-		//CreateBaseLayer(w, r)
+	case "DELETE":
+		models.DeleteLayer(id)
+		utils.Respond(w, utils.Message(true, "Delete success"))
 		break
 	case "PUT":
 		//UpdateBaseLayer(w, r)
@@ -133,7 +240,30 @@ var CheckHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var FieldsHandler = func(w http.ResponseWriter, r *http.Request) {
-	utils.Respond(w, models.GetFieldsList())
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetFieldsList())
+		break
+	case "POST":
+		CreateField(w, r)
+		break
+	case "PUT":
+		UpdateField(w, r)
+		break
+	}
+}
+
+var FieldsIdHandler = func(w http.ResponseWriter, r *http.Request) {
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetFieldsByLayerId(id))
+		break
+	case "DELETE":
+		models.DeleteFieldById(id)
+		utils.Respond(w, utils.Message(true, "Delete success"))
+		break
+	}
 }
 
 var CoordinatesHandler = func(w http.ResponseWriter, r *http.Request) {
@@ -344,4 +474,28 @@ var PostUserGroup = func(w http.ResponseWriter, r *http.Request) {
 		models.UpdateUserGroup(ug)
 	}
 	utils.Created(w, int64(ug.Id))
+}
+
+func CreateField(w http.ResponseWriter, r *http.Request) {
+	f := &models.Field{}
+	err := json.NewDecoder(r.Body).Decode(f)
+	if err != nil {
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+
+	id := models.CreateField(f)
+	utils.Created(w, id)
+}
+
+func UpdateField(w http.ResponseWriter, r *http.Request) {
+	f := &models.Field{}
+	err := json.NewDecoder(r.Body).Decode(f)
+	if err != nil {
+		fmt.Println(err)
+		utils.Respond(w, utils.Message(false, "Error while decoding request body"))
+		return
+	}
+	models.UpdateField(f)
+	utils.Respond(w, utils.Message(true, "Update success"))
 }

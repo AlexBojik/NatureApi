@@ -17,16 +17,23 @@ func main() {
 	router.HandleFunc("/base_layers", h.BaseLayerHandler).Methods("GET", "POST", "PUT")
 	router.HandleFunc("/base_layers/{id:[0-9]+}", h.BaseLayerHandlerDelete).Methods("DELETE")
 
+	// Dictionaries
+	router.HandleFunc("/dictionaries", h.DictionariesHandler).Methods("GET", "POST", "PUT")
+	router.HandleFunc("/values", h.ValuesHandler).Methods("GET", "POST", "PUT")
+	router.HandleFunc("/dictionaries/{id:[0-9]+}", h.DictionariesIdHandler).Methods("GET", "DELETE")
+	router.HandleFunc("/values/{id:[0-9]+}", h.ValuesIdHandler).Methods("DELETE")
+
 	// Layers
 	router.HandleFunc("/layers", h.LayersHandler).Methods("GET", "POST", "PUT")
-	router.HandleFunc("/layers/{id:[0-9]+}", h.LayerHandler).Methods("GET")
+	router.HandleFunc("/layers/{id:[0-9]+}", h.LayerHandler).Methods("GET", "DELETE")
 	router.HandleFunc("/cluster/{id:[0-9]+}", h.ClusterHandler).Methods("GET")
 
 	// filter
 	router.HandleFunc("/filter", h.FilterHandler).Methods("POST")
 
 	// additional fields
-	router.HandleFunc("/fields", h.FieldsHandler).Methods("GET")
+	router.HandleFunc("/fields", h.FieldsHandler).Methods("GET", "POST", "PUT")
+	router.HandleFunc("/fields/{id:[0-9]+}", h.FieldsIdHandler).Methods("GET", "DELETE")
 
 	//coordinates
 	router.HandleFunc("/coordinates", h.CoordinatesHandler).Methods("PUT")
@@ -61,6 +68,7 @@ func main() {
 
 	// objects
 	router.HandleFunc("/objects", h.ObjectsHandler).Methods("POST", "PUT")
+	router.HandleFunc("/objects/{id:[0-9]+}", h.ObjectsIdHandler).Methods("DELETE")
 
 	router.PathPrefix("/image/").Handler(http.StripPrefix("/image/", http.FileServer(http.Dir("images"))))
 

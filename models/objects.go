@@ -63,3 +63,7 @@ func CreateObject(o *Object) int64 {
 
 	return id
 }
+
+func DeleteObjectById(id int) {
+	db.Exec("delete from objects where id = ?", id)
+}
