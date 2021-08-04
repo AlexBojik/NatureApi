@@ -34,10 +34,12 @@ type UserGroups struct {
 
 func GetUser(token string) *User {
 	rows, err := db.Query(sql.User, token)
+	var user = User{}
+
 	if err != nil {
 		log.Print(err)
+		return &user
 	}
-	var user = User{}
 
 	if rows.Next() {
 		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId)

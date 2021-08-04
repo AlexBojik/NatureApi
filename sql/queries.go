@@ -19,7 +19,7 @@ var FeaturesByIds = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojso
 var FeaturesByRegion = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id WHERE ST_Contains(ST_GeomFromText(?), g) LIMIT 100"
 var FieldsList = "select id, name from dictionary_values"
 var FeaturesByFields = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id inner join (select objectId id from fields_values where value_num in (%s)) fv on o.id = fv.id"
-var CoordinatesUpdate = "update coordinates SET g=ST_GeomFromText(?) where id=?"
+var CoordinatesUpdate = "update coordinates SET g=ST_GeomFromText(?, 4326) where id=?"
 var ClusterCoordinate = "select o.id, o.layerId, o.name, ST_AsGeoJSON(ST_Centroid(g)) as geojson from coordinates c  inner join objects o on c.id  = o.id  WHERE layerId = ? and ST_GeometryType(g) IN ('POLYGON', 'MULTIPOLYGON')"
 var User = "select name, token, phone, email, snils, regAddr, proAddr, doc, admin, layers, dicts, messages, info, groupId from users where token = ?"
 var UserList = "select name, token, phone, email, snils, regAddr, proAddr, doc, admin, layers, dicts, messages, info, groupId from users where groupId = ? or ? = 0"

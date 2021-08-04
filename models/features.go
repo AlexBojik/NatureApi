@@ -57,11 +57,12 @@ func GetFeaturesBy(filter *Filter, hasInfoRole bool) []*Object {
 		break
 	}
 
+	var objects = make([]*Object, 0)
 	if err != nil {
 		log.Print(err)
+		return objects
 	}
 
-	var objects = make([]*Object, 0)
 	for rows.Next() {
 		ob := Object{}
 		err = rows.Scan(&ob.Id, &ob.LayerId, &ob.Name, &ob.GeoJson)
