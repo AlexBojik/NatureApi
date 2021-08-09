@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	h "water-api/handlers"
+	"water-api/models"
 )
 
 func main() {
@@ -42,7 +43,7 @@ func main() {
 	router.HandleFunc("/check", h.CheckHandler).Methods("POST")
 
 	// user
-	router.HandleFunc("/user/{token}", h.UserHandler).Methods("GET")
+	router.HandleFunc("/user/{token}", h.UserHandler).Methods("GET", "DELETE")
 	router.HandleFunc("/user", h.UserCreateHandler).Methods("POST")
 	router.HandleFunc("/user_put", h.UserPutHandler).Methods("POST")
 	router.HandleFunc("/user_list/{id:[0-9]+}", h.UserListHandler).Methods("GET")
@@ -70,7 +71,15 @@ func main() {
 	router.HandleFunc("/objects", h.ObjectsHandler).Methods("POST", "PUT")
 	router.HandleFunc("/objects/{id:[0-9]+}", h.ObjectsIdHandler).Methods("DELETE")
 
+	// dumps
+	router.HandleFunc("/dumps", h.DumpsHandler).Methods("GET", "POST")
+
+	// restore
+	router.HandleFunc("/restore/{name}", h.RestoreHandler).Methods("GET")
+	router.HandleFunc("/tables", h.TablesHandler).Methods("GET")
+
 	router.PathPrefix("/image/").Handler(http.StripPrefix("/image/", http.FileServer(http.Dir("images"))))
+	router.PathPrefix("/dump/").Handler(http.StripPrefix("/dump/", http.FileServer(http.Dir("dumps"))))
 
 	os.Mkdir("images", 0777)
 	fmt.Println("Server is listening...")
@@ -82,4 +91,5 @@ func main() {
 		handlers.AllowedOrigins([]string{"*"}))(router)
 
 	http.ListenAndServe(":"+port, cors)
+	defer models.CloseDB()
 }

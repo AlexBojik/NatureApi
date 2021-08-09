@@ -101,6 +101,35 @@ var ObjectsHandler = func(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+var DumpsHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetDumpsNames())
+		break
+	case "POST":
+		models.BackupDB()
+		utils.Respond(w, utils.Message(true, "Backup created"))
+		break
+	}
+}
+
+var RestoreHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		models.RestoreDB(mux.Vars(r)["name"])
+		utils.Respond(w, utils.Message(true, "Restored backup"))
+		break
+	}
+}
+
+var TablesHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetTables())
+		break
+	}
+}
+
 var ObjectsIdHandler = func(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 
@@ -294,7 +323,14 @@ var WebEsiaCodeHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var UserHandler = func(w http.ResponseWriter, r *http.Request) {
-	utils.Respond(w, models.GetUser(mux.Vars(r)["token"]))
+	token := mux.Vars(r)["token"]
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetUser(token))
+	case "DELETE":
+		models.DeleteUser(token)
+		utils.Respond(w, utils.Message(true, "Delete success"))
+	}
 }
 
 var UserListHandler = func(w http.ResponseWriter, r *http.Request) {

@@ -6,6 +6,7 @@ import (
 )
 
 type User struct {
+	Id       int    `json:"id"`
 	Name     string `json:"name"`
 	Token    string `json:"token"`
 	Phone    string `json:"phone"`
@@ -19,6 +20,7 @@ type User struct {
 	Dicts    bool   `json:"dicts"`
 	Messages bool   `json:"messages"`
 	Info     bool   `json:"info"`
+	Block    bool   `json:"block"`
 	GroupId  int    `json:"group"`
 }
 
@@ -42,7 +44,7 @@ func GetUser(token string) *User {
 	}
 
 	if rows.Next() {
-		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId)
+		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Block)
 		if err != nil {
 			log.Print(err)
 		}
@@ -59,7 +61,7 @@ func GetUserList(id int) []*User {
 	}
 	for rows.Next() {
 		user := User{}
-		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId)
+		err = rows.Scan(&user.Id, &user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Block)
 		res = append(res, &user)
 	}
 
@@ -74,7 +76,7 @@ func CreateUser(user *User) {
 }
 
 func UpdateUser(user *User) {
-	_, err := db.Exec(sql.UserUpdate, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Token)
+	_, err := db.Exec(sql.UserUpdate, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Block, &user.Token)
 	if err != nil {
 		log.Print(err)
 	}
@@ -117,4 +119,8 @@ func UpdateUserGroup(ug *UserGroups) {
 
 func HasInfoRole(token string) bool {
 	return GetUser(token).Info
+}
+
+func DeleteUser(token string) {
+	db.Exec("delete from users where token = ?", token)
 }
