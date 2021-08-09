@@ -44,10 +44,12 @@ func PostMessage(r *http.Request) []int64 {
 	row, err := db.Exec(sql.MessageCreate, m.Token, m.Text, point, timestamp)
 	var res = make([]int64, 0)
 	if err != nil {
+		fmt.Print(err)
 		return res
 	}
 	id, err := row.LastInsertId()
 	if err != nil {
+		fmt.Print(err)
 		return res
 	}
 	m.Id = id
@@ -59,7 +61,10 @@ func PostMessage(r *http.Request) []int64 {
 		im.Jpeg = fileName
 		ims = append(ims, im)
 
-		_, _ = db.Exec(sql.ImageCreate, id, fileName)
+		_, err = db.Exec(sql.ImageCreate, id, fileName)
+		if err != nil {
+			fmt.Print(err)
+		}
 	}
 	m.Images = ims
 	go SendMail(m)
@@ -163,6 +168,9 @@ func SendMail(m *Message) {
 	}
 
 	_, err = db.Exec(sql.MessageUpdateStatus, 1, m.Id)
+	if err != nil {
+		fmt.Print(err)
+	}
 }
 
 func sendMail(addr, from, body string, to []string) error {

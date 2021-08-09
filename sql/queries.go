@@ -29,7 +29,7 @@ var UserGroupCreate = "insert into user_groups (name, admin, layers, dicts, mess
 var UserGroupUpdate = "update user_groups SET name=?, admin=?, layers=?, dicts=?, messages=?, info=? where id=?"
 var UserUpdate = "update users SET admin=?, layers=?, dicts=?, messages=?, info=?, groupId=?, block=? where token=?"
 var Message = "select data FROM images where message_id = ?"
-var MessageCreate = "insert into user_messages (token, text, point, time) values(?, ?, ST_GeomFromText(?), ?)"
+var MessageCreate = "insert into user_messages (token, text, point, time) values(?, ?, ST_GeomFromText(?, 4326), ?)"
 var MessageCount = "select count(id) from user_messages WHERE status = 0"
 var MessageList = "select um.id, um.text, u.name, um.status, um.time, um.end, um.comment, um.employerId, e.name as employerName from user_messages um inner join users u ON um.token = u.token left join users e ON um.employerId = e.token"
 var MessageNotSendList = "select um.id, um.text, u.name, um.status, ST_AsGeoJSON(um.point) as point, u.token from user_messages um inner join users u ON um.token = u.token where um.status = 0"
