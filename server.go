@@ -78,8 +78,13 @@ func main() {
 	router.HandleFunc("/restore/{name}", h.RestoreHandler).Methods("GET")
 	router.HandleFunc("/tables", h.TablesHandler).Methods("GET")
 
+	//files
+	router.HandleFunc("/files", h.FilesHandler).Methods("GET", "POST")
+	router.HandleFunc("/files/{id:[0-9]+}", h.FilesHandler).Methods("DELETE")
+
 	router.PathPrefix("/image/").Handler(http.StripPrefix("/image/", http.FileServer(http.Dir("images"))))
 	router.PathPrefix("/dump/").Handler(http.StripPrefix("/dump/", http.FileServer(http.Dir("dumps"))))
+	router.PathPrefix("/file/").Handler(http.StripPrefix("/file/", http.FileServer(http.Dir("files"))))
 
 	os.Mkdir("images", 0777)
 	fmt.Println("Server is listening...")

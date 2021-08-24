@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"github.com/gorilla/mux"
 	_ "go.mozilla.org/pkcs7"
+	"io"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 	"water-api/esia"
@@ -447,6 +449,43 @@ var NewsHandler = func(w http.ResponseWriter, r *http.Request) {
 		UpdateNews(w, r)
 		break
 	}
+}
+
+var FilesHandler = func(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case "GET":
+		utils.Respond(w, models.GetFiles())
+		break
+	case "POST":
+		uploadHandler(w, r)
+		break
+	case "DELETE":
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		models.DeleteFile(id)
+		break
+	}
+}
+
+func uploadHandler(w http.ResponseWriter, r *http.Request) {
+	file, handler, err := r.FormFile("fileKey")
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer file.Close()
+	os.Mkdir("files", 0777)
+
+	f, err := os.OpenFile("files/"+handler.Filename, os.O_WRONLY|os.O_CREATE, 0666)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	//_, _ = io.WriteString(w, "File "+fileName+" Uploaded successfully")
+	_, _ = io.Copy(f, file)
+
+	models.CreateFile(handler.Filename)
+	utils.Respond(w, utils.Message(true, "Upload success"))
 }
 
 var NewsFilteredListHandler = func(w http.ResponseWriter, r *http.Request) {
