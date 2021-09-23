@@ -27,7 +27,11 @@ func GetNews(filtered bool) []*News {
 	rows, err := db.Query(sqlRequest, now, now)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		var created string
 		var start string

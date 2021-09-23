@@ -28,7 +28,11 @@ func CheckPosition(check *Check) []string {
 	rows, err := db.Query(q, check.Lon, check.Lat)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		v := ""
 		err = rows.Scan(&v)
@@ -38,8 +42,11 @@ func CheckPosition(check *Check) []string {
 }
 
 func GetFeaturesBy(filter *Filter, hasInfoRole bool) []*Object {
+	var objects = make([]*Object, 0)
+
 	var rows *sql2.Rows = nil
 	var err error = nil
+
 	switch filter.Type {
 	case 1:
 		rows, err = db.Query(sql.FeaturesByFilter, filter.Str, filter.Str, filter.Str)
@@ -57,11 +64,11 @@ func GetFeaturesBy(filter *Filter, hasInfoRole bool) []*Object {
 		break
 	}
 
-	var objects = make([]*Object, 0)
 	if err != nil {
 		log.Print(err)
 		return objects
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		ob := Object{}
@@ -78,6 +85,10 @@ func GetFeaturesBy(filter *Filter, hasInfoRole bool) []*Object {
 			nv := NameValue{}
 			err = rowsF.Scan(&nv.Name, &nv.Value)
 			description += "<strong>" + nv.Name + ": </strong>" + nv.Value + "<br>"
+		}
+		err = rowsF.Close()
+		if err != nil {
+			continue
 		}
 
 		ob.Description = description

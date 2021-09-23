@@ -75,7 +75,7 @@ func GetMessagesCount() int {
 	var count = 0
 
 	row := db.QueryRow(sql.MessageCount)
-	row.Scan(&count)
+	_ = row.Scan(&count)
 	return count
 }
 
@@ -83,7 +83,11 @@ func SendMessages() int {
 	rows, err := db.Query(sql.MessageNotSendList)
 	if err != nil {
 		log.Print(err)
+		return 0
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		var point *geojson.Geometry
 		m := Message{}
@@ -104,7 +108,11 @@ func GetMessageList() []*Message {
 	rows, err := db.Query(sql.MessageList)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		m := Message{}
 		err = rows.Scan(&m.Id, &m.Text, &m.UserName, &m.Status, &m.Time, &m.End, &m.Comment, &m.EmployerId, &m.EmployerName)
@@ -120,7 +128,11 @@ func GetMessage(id string) []Image {
 	rows, err := db.Query(sql.Message, idInt)
 	if err != nil {
 		log.Print(err)
+		return images
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		image := Image{}
 		err = rows.Scan(&image.Jpeg)

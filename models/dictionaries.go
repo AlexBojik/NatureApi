@@ -22,7 +22,10 @@ func GetDictionaries() []*Dictionary {
 	rows, err := db.Query(sql.DictionaryList)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		dct := Dictionary{}
 		err = rows.Scan(&dct.Id, &dct.Name)
@@ -52,7 +55,10 @@ func GetValues(id int) []*Value {
 	rows, err := db.Query("select id, name, dictId from dictionary_values where dictId = ?", id)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		val := Value{}
 		err = rows.Scan(&val.Id, &val.Name, &val.DictId)

@@ -43,6 +43,8 @@ func GetUser(token string) *User {
 		return &user
 	}
 
+	defer rows.Close()
+
 	if rows.Next() {
 		err = rows.Scan(&user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Block)
 		if err != nil {
@@ -58,7 +60,11 @@ func GetUserList(id int) []*User {
 	rows, err := db.Query(sql.UserList, id, id)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		user := User{}
 		err = rows.Scan(&user.Id, &user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc, &user.Admin, &user.Layers, &user.Dicts, &user.Messages, &user.Info, &user.GroupId, &user.Block)
@@ -88,7 +94,11 @@ func GetUserGroups() []*UserGroups {
 	rows, err := db.Query(sql.UserGroupList)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		ug := UserGroups{}
 		err = rows.Scan(&ug.Id, &ug.Name, &ug.Admin, &ug.Layers, &ug.Dicts, &ug.Messages, &ug.Info)

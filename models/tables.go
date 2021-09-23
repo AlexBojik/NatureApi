@@ -14,7 +14,11 @@ func GetTables() []*Table {
 	rows, err := db.Query("SHOW TABLES")
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		bl := Table{}
 		err = rows.Scan(&bl.Name)

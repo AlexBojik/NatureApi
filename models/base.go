@@ -105,7 +105,11 @@ func GetDumpsNames() []*Dump {
 	rows, err := db.Query("SELECT id, name FROM  dumps")
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		d := Dump{}
 		err = rows.Scan(&d.Id, &d.Name)

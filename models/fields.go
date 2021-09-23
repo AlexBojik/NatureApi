@@ -24,7 +24,10 @@ func GetDictionariesValuesList() []*DictionaryValue {
 	rows, err := db.Query(sql.FieldsList)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		f := DictionaryValue{}
 		err = rows.Scan(&f.Id, &f.Name)
@@ -40,7 +43,10 @@ func GetFieldsList() []*Field {
 	rows, err := db.Query("select id, name, type, limitation from fields")
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		f := Field{}
 		err = rows.Scan(&f.Id, &f.Name, &f.Type, &f.Limitation)
@@ -66,7 +72,11 @@ func GetFieldsByLayerId(id int) []*Field {
 	rows, err := db.Query("select id, name, type from fields where layerId = ?", id)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		f := Field{}
 		err = rows.Scan(&f.Id, &f.Name, f.Type)

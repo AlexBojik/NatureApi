@@ -21,7 +21,11 @@ func GetFiles() []*File {
 	rows, err := db.Query("SELECT id, name FROM files")
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
+
 	for rows.Next() {
 		f := File{}
 		err = rows.Scan(&f.Id, &f.Name)

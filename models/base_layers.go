@@ -20,7 +20,10 @@ func GetBaseLayers() []*BaseLayer {
 	rows, err := db.Query(sql.BaseLayerList)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+	defer rows.Close()
+
 	for rows.Next() {
 		bl := BaseLayer{}
 		err = rows.Scan(&bl.Id, &bl.Name, &bl.Url, &bl.Description, &bl.MinZoom, &bl.MaxZoom)

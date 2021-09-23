@@ -40,7 +40,10 @@ func GetLayers(hasInfoRole bool) []*GroupLayer {
 	rows, err := db.Query(sql.GroupLayerList)
 	if err != nil {
 		log.Print(err)
+		return res
 	}
+
+	defer rows.Close()
 	for rows.Next() {
 		bl := GroupLayer{}
 		bl.Layers = make([]Layer, 0)
@@ -50,6 +53,7 @@ func GetLayers(hasInfoRole bool) []*GroupLayer {
 		rowsL, err := db.Query(sql.LayerList, bl.Id, hasInfoRole)
 		if err != nil {
 			log.Print(err)
+			continue
 		}
 		for rowsL.Next() {
 			l := Layer{}
@@ -71,18 +75,24 @@ func GetLayers(hasInfoRole bool) []*GroupLayer {
 				&l.Order)
 			bl.Layers = append(bl.Layers, l)
 		}
-
+		err = rowsL.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
 		res = append(res, &bl)
 	}
-
 	return res
 }
 
 func GetLayer(id int) *geojson.FeatureCollection {
+	res := geojson.FeatureCollection{}
+
 	rows, err := db.Query(sql.Layer, id)
 	if err != nil {
 		log.Print(err)
+		return &res
 	}
+	defer rows.Close()
 
 	var objects = make([]*geojson.Feature, 0)
 	for rows.Next() {
@@ -96,17 +106,20 @@ func GetLayer(id int) *geojson.FeatureCollection {
 
 		objects = append(objects, &f)
 	}
-	res := geojson.FeatureCollection{}
 	res.Features = objects[:]
 
 	return &res
 }
 
 func GetCluster(id int) *geojson.FeatureCollection {
+	res := geojson.FeatureCollection{}
+
 	rows, err := db.Query(sql.ClusterCoordinate, id)
 	if err != nil {
 		log.Print(err)
+		return &res
 	}
+	defer rows.Close()
 
 	var objects = make([]*geojson.Feature, 0)
 	for rows.Next() {
@@ -120,7 +133,6 @@ func GetCluster(id int) *geojson.FeatureCollection {
 
 		objects = append(objects, &f)
 	}
-	res := geojson.FeatureCollection{}
 	res.Features = objects[:]
 
 	return &res
