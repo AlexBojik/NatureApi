@@ -288,7 +288,7 @@ var FieldsIdHandler = func(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
 	switch r.Method {
 	case "GET":
-		utils.Respond(w, models.GetFieldsByLayerId(id))
+		//utils.Respond(w, models.GetFieldsByLayerId(id))
 		break
 	case "DELETE":
 		models.DeleteFieldById(id)

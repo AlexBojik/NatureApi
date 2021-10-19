@@ -14,7 +14,7 @@ var NewsUpdate = "update news SET created=?, start_date=?, end_date=?, descr=? w
 var BaseLayerDelete = "delete from base_layers where id=?"
 var NewsDelete = "delete from news where id=?"
 var FeaturesByFilter = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id inner join (select id from objects o where name like CONCAT('%', ?, '%') union select objectId from fields_values fv where value like CONCAT('%', ?, '%') union select objectId id from fields_values fv inner join dictionary_values dv on fv.value_num = dv.id where name like CONCAT('%',? ,'%') LIMIT 100) f on o.id = f.id"
-var AdditionalFields = "select f.name, IFNULL(dv.name, fv.value) as value from fields_values fv INNER JOIN fields f ON f.id = fv.fieldId AND (not f.limitation OR ?) LEFT JOIN dictionary_values dv  ON f.`type` = dv.dictId AND fv.value_num = dv.id where objectId = ? order by fv.fieldId"
+var AdditionalFields = "select f.name, IFNULL(dv.name, fv.value) as value from fields_values fv INNER JOIN fields f ON f.id = fv.fieldId AND (not f.limitation OR ?) LEFT JOIN dictionary_values dv  ON f.`type` = dv.dictId AND fv.value_num = dv.id where objectId = ? order by f.sort"
 var FeaturesByIds = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id where o.id in (%s)"
 var FeaturesByRegion = "select o.id, o.layerId, o.name, ST_AsGeoJSON(c.g) as geojson from objects o inner join coordinates c on o.id = c.id WHERE ST_Contains(ST_GeomFromText(?), g) LIMIT 100"
 var FieldsList = "select id, name from dictionary_values"
