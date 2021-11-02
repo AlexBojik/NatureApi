@@ -73,6 +73,7 @@ func main() {
 
 	// dumps
 	router.HandleFunc("/dumps", h.DumpsHandler).Methods("GET", "POST")
+	router.HandleFunc("/dumps/{id:[0-9]+}", h.DumpsHandler).Methods("DELETE")
 
 	// restore
 	router.HandleFunc("/restore/{name}", h.RestoreHandler).Methods("GET")

@@ -118,3 +118,19 @@ func GetDumpsNames() []*Dump {
 
 	return res
 }
+
+func DeleteDump(id int) {
+	rows, err := db.Query("SELECT name FROM dumps WHERE id = ?", id)
+	if err != nil {
+		log.Print(err)
+	}
+	name := ""
+	for rows.Next() {
+		err = rows.Scan(&name)
+		if err != nil {
+			fmt.Println(err)
+		}
+		os.Remove("dumps/" + name)
+		db.Exec("DELETE FROM dumps WHERE id = ?", id)
+	}
+}

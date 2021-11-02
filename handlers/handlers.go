@@ -112,6 +112,10 @@ var DumpsHandler = func(w http.ResponseWriter, r *http.Request) {
 		models.BackupDB()
 		utils.Respond(w, utils.Message(true, "Backup created"))
 		break
+	case "DELETE":
+		id, _ := strconv.Atoi(mux.Vars(r)["id"])
+		models.DeleteDump(id)
+		break
 	}
 }
 
