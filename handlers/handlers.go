@@ -319,6 +319,7 @@ var AuthHandler = func(w http.ResponseWriter, r *http.Request) {
 
 var WebAuthHandler = func(w http.ResponseWriter, r *http.Request) {
 	target := esia.GetAuthUrl(false)
+	fmt.Println(target)
 	http.Redirect(w, r, target, 302)
 }
 
