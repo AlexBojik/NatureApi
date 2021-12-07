@@ -3,8 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	_ "go.mozilla.org/pkcs7"
 	"io"
 	"net/http"
 	"os"
@@ -13,6 +11,9 @@ import (
 	"water-api/esia"
 	"water-api/models"
 	"water-api/utils"
+
+	"github.com/gorilla/mux"
+	_ "go.mozilla.org/pkcs7"
 )
 
 var BaseLayerHandler = func(w http.ResponseWriter, r *http.Request) {
@@ -317,7 +318,8 @@ var AuthHandler = func(w http.ResponseWriter, r *http.Request) {
 }
 
 var WebAuthHandler = func(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, esia.GetAuthUrl(false), 302)
+	target := esia.GetAuthUrl(false)
+	http.Redirect(w, r, target, 302)
 }
 
 var EsiaCodeHandler = func(w http.ResponseWriter, r *http.Request) {

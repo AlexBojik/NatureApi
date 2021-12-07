@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"database/sql"
 	"fmt"
-	"github.com/joho/godotenv"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/joho/godotenv"
 )
 
 var db *sql.DB
@@ -35,7 +36,7 @@ func init() {
 	if err != nil {
 		log.Println(err)
 	}
-
+	
 	db = database
 }
 
