@@ -313,14 +313,21 @@ var CoordinatesHandler = func(w http.ResponseWriter, r *http.Request) {
 	utils.Respond(w, utils.Message(true, "Update success"))
 }
 
+// решение с редиректом из-за длинного урл
 var AuthHandler = func(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, esia.GetAuthUrl(true), 302)
+	//http.Redirect(w, r, esia.GetAuthUrl(true), 302)
+	addr := esia.GetAuthUrl(true)
+	body := "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url='" + addr + "'\" />  </head> <body>  <p>Please follow <a href=\"" + addr + "\">this link</a>.</p>  </body> </html>\n<>"
+	fmt.Fprintln(w, body)	
 }
-
-var WebAuthHandler = func(w http.ResponseWriter, r *http.Request) {
-	target := esia.GetAuthUrl(false)
-	fmt.Println(target)
-	http.Redirect(w, r, target, 302)
+	
+var WebAuthHandler = func(w http.ResponseWriter, r *http.Request) {	
+	addr := esia.GetAuthUrl(false)
+	//http.Redirect(w, r, addr, 302)
+	body := "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url='" + addr + "'\" />  </head> <body>  <p>Please follow <a href=\"" + addr + "\">this link</a>.</p>  </body> </html>\n<>"
+	fmt.Fprintln(w, body)
+	//fmt.Println(len(addr))	
+	//fmt.Println(addr)
 }
 
 var EsiaCodeHandler = func(w http.ResponseWriter, r *http.Request) {
