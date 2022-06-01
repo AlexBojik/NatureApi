@@ -5,7 +5,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
-	"net/http"
+	http "net/http"
 	"os"
 	h "water-api/handlers"
 	"water-api/models"

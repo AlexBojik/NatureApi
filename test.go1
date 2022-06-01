@@ -12,7 +12,7 @@ import (
 
 var db *sql.DB
 
-func main() {
+func init() {
 	dbinit()
 	test()
 }
