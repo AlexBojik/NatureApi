@@ -6,22 +6,23 @@ import (
 )
 
 type User struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Token    string `json:"token"`
-	Phone    string `json:"phone"`
-	Email    string `json:"email"`
-	Snils    string `json:"snils"`
-	RegAddr  string `json:"regAddr"`
-	ProAddr  string `json:"proAddr"`
-	Doc      string `json:"doc"`
-	Admin    bool   `json:"admin"`
-	Layers   bool   `json:"layers"`
-	Dicts    bool   `json:"dicts"`
-	Messages bool   `json:"messages"`
-	Info     bool   `json:"info"`
-	Block    bool   `json:"block"`
-	GroupId  int    `json:"group"`
+	Id       int     `json:"id"`
+	Name     string  `json:"name"`
+	OpenId   float64 `json:"openid"`
+	Token    string  `json:"token"`
+	Phone    string  `json:"phone"`
+	Email    string  `json:"email"`
+	Snils    string  `json:"snils"`
+	RegAddr  string  `json:"regAddr"`
+	ProAddr  string  `json:"proAddr"`
+	Doc      string  `json:"doc"`
+	Admin    bool    `json:"admin"`
+	Layers   bool    `json:"layers"`
+	Dicts    bool    `json:"dicts"`
+	Messages bool    `json:"messages"`
+	Info     bool    `json:"info"`
+	Block    bool    `json:"block"`
+	GroupId  int     `json:"group"`
 }
 
 type UserGroups struct {
@@ -75,7 +76,9 @@ func GetUserList(id int) []*User {
 }
 
 func CreateUser(user *User) {
-	_, err := db.Exec(sql.UserCreate, &user.Name, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc)
+	_, err := db.Exec(sql.UserCreate,
+		/*/ insert /*/ &user.Name, &user.OpenId, &user.Token, &user.Phone, &user.Email, &user.Snils, &user.RegAddr, &user.ProAddr, &user.Doc,
+		/*/ update /*/ &user.Name, &user.OpenId, &user.Token)
 	if err != nil {
 		log.Print(err)
 	}

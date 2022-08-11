@@ -323,11 +323,8 @@ var AuthHandler = func(w http.ResponseWriter, r *http.Request) {
 	
 var WebAuthHandler = func(w http.ResponseWriter, r *http.Request) {	
 	addr := esia.GetAuthUrl(false)
-	//http.Redirect(w, r, addr, 302)
 	body := "<!DOCTYPE html><html><head><meta http-equiv=\"refresh\" content=\"0; url='" + addr + "'\" />  </head> <body>  <p>Please follow <a href=\"" + addr + "\">this link</a>.</p>  </body> </html>\n<>"
 	fmt.Fprintln(w, body)
-	//fmt.Println(len(addr))	
-	//fmt.Println(addr)
 }
 
 var EsiaCodeHandler = func(w http.ResponseWriter, r *http.Request) {

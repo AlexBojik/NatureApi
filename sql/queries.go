@@ -24,7 +24,10 @@ var ClusterCoordinate = "select o.id, o.layerId, o.name, ST_AsGeoJSON(ST_Centroi
 var User = "select name, token, phone, email, snils, regAddr, proAddr, doc, admin, layers, dicts, messages, info, groupId, block from users where token = ?"
 var UserList = "select id, name, token, phone, email, snils, regAddr, proAddr, doc, admin, layers, dicts, messages, info, groupId, block from users where groupId = ? or ? = 0"
 var UserGroupList = "select id, name, admin, layers, dicts, messages, info from user_groups"
-var UserCreate = "insert into users (name, token, phone, email, snils, regAddr, proAddr, doc) values (?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=name, token=token, phone=phone, email=email, token=token, snils=snils, regAddr=regAddr, proAddr=proAddr, doc=doc"
+
+var UserCreate = "insert into users (name, openid, token, phone, email, snils, regAddr, proAddr, doc) values (?, ?, ?, ?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=?, openid=?, token=?, phone=phone, email=email, snils=snils, regAddr=regAddr, proAddr=proAddr, doc=doc"
+
+// var UserCreate = "insert into users (name, openid, token, phone, email, snils, regAddr, proAddr, doc) values ($1, $2, $3, $4, $5, $6, $7, $8, $9) ON DUPLICATE KEY UPDATE name=name, openid=$2, token=token, phone=phone, email=email, snils=snils, regAddr=regAddr, proAddr=proAddr, doc=doc"
 var UserGroupCreate = "insert into user_groups (name, admin, layers, dicts, messages, info) values (?, ?, ?, ?, ?, ?)"
 var UserGroupUpdate = "update user_groups SET name=?, admin=?, layers=?, dicts=?, messages=?, info=? where id=?"
 var UserUpdate = "update users SET admin=?, layers=?, dicts=?, messages=?, info=?, groupId=?, block=? where token=?"

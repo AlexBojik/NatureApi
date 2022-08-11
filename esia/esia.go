@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -13,6 +12,8 @@ import (
 	"strings"
 	"water-api/models"
 	"water-api/utils"
+
+	"github.com/google/uuid"
 )
 
 type Params struct {
@@ -83,14 +84,20 @@ func GetRedirectUrl(r *http.Request, mobile bool) string {
 	p.New()
 	p.getToken(getCodeFromUrl(r), mobile)
 
+	fmt.Println("user with openid:", p.OpenId)
+
 	if p.OpenId > 0 {
 		user := models.User{}
+		user.OpenId = p.OpenId
 		getPersonInfo(&user, &p)
 		getContactInfo(&user, &p)
 		getDocumentInfo(&user, &p)
 		getAddressInfo(&user, &p)
 
+		fmt.Println("Token: ", user.Token)
+
 		if len(user.Token) > 0 {
+			fmt.Println("Create/renew user")
 			models.CreateUser(&user)
 			redirectUrl += "?t=" + user.Token
 		}
@@ -156,7 +163,6 @@ func getPersonInfo(user *models.User, p *Params) {
 
 	info := models.Info{}
 	doRequest(p.RrnsUrl, p.AccessToken, &info)
-
 	user.Name = strings.Join([]string{info.LastName, info.FirstName, info.MiddleName}, " ")
 	user.Token = info.ETag
 	user.Snils = info.Snils
