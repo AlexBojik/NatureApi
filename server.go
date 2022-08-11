@@ -88,8 +88,9 @@ func main() {
 	router.PathPrefix("/file/").Handler(http.StripPrefix("/file/", http.FileServer(http.Dir("files"))))
 
 	os.Mkdir("images", 0777)
-	fmt.Println("Server is listening...")
 	port := os.Getenv("PORT")
+	fmt.Println("Server is listening at port: ", port)
+
 
 	cors := handlers.CORS(
 		handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization", "Token"}),
